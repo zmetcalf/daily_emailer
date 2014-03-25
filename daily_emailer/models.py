@@ -1,5 +1,7 @@
 from django.db import models
 
+from daily_emailer import fields
+
 class Recipient(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -19,7 +21,7 @@ class Email(models.Model):
 class EmailGroup(models.Model):
     group_name = models.CharField(max_length=50)
     emails = models.ManyToManyField('Email')
-    email_order = models.TextField(null=True, blank=True)
+    email_order = fields.OrderField(null=True, blank=True)
 
     def __unicode__(self):
         return self.group_name

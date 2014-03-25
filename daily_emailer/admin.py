@@ -10,6 +10,19 @@ class AttachmentInline(admin.TabularInline):
 class EmailAdmin(admin.ModelAdmin):
     inlines = [AttachmentInline,]
 
+class EmailGroupAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/css/jquery-ui.min.css',)
+        }
+        js = (
+            '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
+            '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js',
+            '//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js',
+            'js/email_sort.js',
+        )
+
 admin.site.register(Email, EmailAdmin)
-admin.site.register([Recipient, EmailGroup, Campaign])
+admin.site.register(EmailGroup, EmailGroupAdmin)
+admin.site.register([Recipient, Campaign])
 
