@@ -1,10 +1,12 @@
 $(document).ready(function() {
   $('#id_email_order').hide();
-  $('#id_email_order').before('<div id="id_sortable_email"><h1>Please save before sorting.</h1></div>');
-  $('#id_emails').change(function() {
-    $('#id_sortable_email').html('<h1>Please save before sorting.</h1>');
-  });
-  render_list();
+  $('.field-id').hide();
+  if($('.field-id').children().children().text() === 'ID:(None)') {
+    $('.field-email_order').hide();
+  } else {
+    $('#id_email_order').before('<div id="id_sortable_email"></div>');
+    render_list();
+  }
 });
 
 function render_list() {

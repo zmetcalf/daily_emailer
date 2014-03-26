@@ -29,6 +29,13 @@ class AjaxAssociatedEmailTests(TestCase):
         self.assertEqual(data[1]['fields']['message'], 'Message2')
         self.assertEqual(data[2]['fields']['message'], 'Message3')
 
+    def test_ajax_associated_emails_authenticated_empty(self):
+        self.client.login(username='Admin', password='password')
+        response = self.client.post('/associated_emails/2/')
+        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data, [])
+
     def test_ajax_associated_emails_authenticated(self):
         self.client.login(username='Admin', password='password')
         response = self.client.post('/associated_emails/1/')
