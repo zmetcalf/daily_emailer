@@ -13,6 +13,7 @@ class Recipient(models.Model):
 class Email(models.Model):
     subject = models.CharField(max_length=77)
     message = models.TextField()
+    email_group = models.ForeignKey('EmailGroup')
 
     def __unicode__(self):
         return (self.subject[:50] + '...') if len(self.subject) > 50 \
@@ -20,7 +21,6 @@ class Email(models.Model):
 
 class EmailGroup(models.Model):
     group_name = models.CharField(max_length=50)
-    emails = models.ManyToManyField('Email')
     email_order = fields.OrderField(null=True, blank=True)
 
     def __unicode__(self):

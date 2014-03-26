@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-
 from django.contrib import admin
+
+from daily_emailer import views
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -10,6 +12,8 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^associated_emails/(?P<group_id>\d+)/$',
+        'daily_emailer.views.ajax_associated_emails'),
 )
 
 if settings.DEBUG:
