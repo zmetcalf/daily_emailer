@@ -51,9 +51,10 @@ var OrderedList = Backbone.Model.extend({
   },
 
   sort_and_set_emails: function(json_list) {
-    var order_list = this.get('order_list');
-    this.set('email_list', json_list.sort(function(email) {
-        return _.indexOf(order_list, email.pk)
+    this.set('email_list', _.map(this.get('order_list'), function(item) {
+      return _.find(json_list, function(json_item) {
+        return json_item.pk == item;
+      });
     }));
   },
 

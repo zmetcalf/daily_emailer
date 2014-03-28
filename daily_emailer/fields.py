@@ -10,8 +10,11 @@ class OrderField(models.TextField):
         super(OrderField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
-        if value == None:
+        if value == None or value == '' or value == '[]':
             return []
+
+        if isinstance(value, basestring):
+            return value
 
         formated_list = list(map(int, value.strip('[]').split(',')))
         return formated_list
