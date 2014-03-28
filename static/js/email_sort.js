@@ -52,14 +52,14 @@ var OrderedList = Backbone.Model.extend({
 
   sort_and_set_emails: function(json_list) {
     var order_list = this.get('order_list');
-    this.email_list = json_list.sort(function(email) {
+    this.set('email_list', json_list.sort(function(email) {
         return _.indexOf(order_list, email.pk)
-    });
+    }));
   },
 
   render_list: function() {
     var view = { 'email': [] };
-    _.each(this.email_list, function(email) {
+    _.each(this.get('email_list'), function(email) {
       view.email.push({'id': email.pk, 'name':  email.fields.subject});
     });
     if(view.email.length) {

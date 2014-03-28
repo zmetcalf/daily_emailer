@@ -31,6 +31,14 @@ test("sort_and_set_emails", function() {
   $('#id_email_order').text('3,1');
   var ordered_list = new OrderedList;
   ordered_list.merge_order(simulated_ajax_response);
-  deepEqual(ordered_list.email_list[0].pk, 3);
-  deepEqual(ordered_list.email_list[1].pk, 1);
+  deepEqual(ordered_list.get('email_list')[0].pk, 3);
+  deepEqual(ordered_list.get('email_list')[1].pk, 1);
+});
+
+test("resort", function() {
+  var ordered_list = new OrderedList;
+  ordered_list.merge_order(simulated_ajax_response);
+  ordered_list.resort(['sortable_1', 'sortable_3']);
+  deepEqual(ordered_list.get('order_list'), [1,3]);
+  deepEqual($('#id_email_order').text(), '1,3');
 });
