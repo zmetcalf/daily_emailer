@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
 
-from daily_emailer.models import Email, EmailGroup
+from daily_emailer import models, fields
 
 class AjaxAssociatedEmailTests(TestCase):
 
@@ -12,7 +12,7 @@ class AjaxAssociatedEmailTests(TestCase):
         user = User.objects.create_user('Admin', 'admin@sample.com', 'password')
         user.is_staff = True
         user.save()
-        eq = EmailGroup(group_name='NewRep')
+        eq = models.EmailGroup(group_name='NewRep')
         eq.save()
         eq.email_set.create(subject='Subject1', message='Message1')
         eq.email_set.create(subject='Subject2', message='Message2')
@@ -45,3 +45,12 @@ class AjaxAssociatedEmailTests(TestCase):
         response = self.client.post('/associated_emails/1/')
         self.assertEqual(response.status_code, 404)
 
+class OrderFieldTests(TestCase):
+
+    def setUp(self):
+        eq = models.EmailGroup(group_name='NewRep', email_order='3,4,1')
+        eq.save()
+
+    def test_order_field_to_python(self):
+        email_group = models.EmailGroup.objects.all().filter(group_name='NewRep')
+        self.assertEqual(email_group[0].email_order, [3,4,1])

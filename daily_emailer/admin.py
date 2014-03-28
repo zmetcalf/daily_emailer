@@ -1,10 +1,9 @@
 from django.contrib import admin
 
-from daily_emailer.models import Recipient, Email, EmailGroup, Campaign, \
-                                 Attachment
+from daily_emailer import models
 
 class AttachmentInline(admin.TabularInline):
-    model = Attachment
+    model = models.Attachment
     extra = 1
 
 class EmailAdmin(admin.ModelAdmin):
@@ -26,7 +25,10 @@ class EmailGroupAdmin(admin.ModelAdmin):
             'js/email_sort.js',
         )
 
-admin.site.register(Email, EmailAdmin)
-admin.site.register(EmailGroup, EmailGroupAdmin)
-admin.site.register([Recipient, Campaign])
+class CampaignAdmin(admin.ModelAdmin):
+    pass
 
+admin.site.register(models.Email, EmailAdmin)
+admin.site.register(models.EmailGroup, EmailGroupAdmin)
+admin.site.register(models.Campaign, CampaignAdmin)
+admin.site.register(models.Recipient)

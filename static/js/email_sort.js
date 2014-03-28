@@ -94,7 +94,7 @@ $(document).ready(function() {
   $('.field-id').hide();
   if($('.field-id > div > p').text() === '(None)') {
     $('.field-email_order').hide();
-  } else {
+  } else if(!isNaN(parseInt($('.field-id > div > p').text()))) {
     $('#id_email_order').before('<div id="id_sortable_email"></div>');
     order_list = new OrderedList;
   }
