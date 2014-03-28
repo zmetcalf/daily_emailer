@@ -31,7 +31,6 @@ test("sort_and_set_emails", function() {
   $('#id_email_order').text('3,1');
   var ordered_list = new OrderedList;
   ordered_list.merge_order(simulated_ajax_response);
-  ordered_list.sort_and_set_emails();
   deepEqual(ordered_list.email_list[0].pk, 3);
   deepEqual(ordered_list.email_list[1].pk, 1);
 });

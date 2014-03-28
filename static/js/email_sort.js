@@ -6,11 +6,12 @@ var OrderedList = Backbone.Model.extend({
     _.bindAll(this, 'merge_order');
 
     this.get_order();
-    this.email_list = $.ajax(('/associated_emails/' +
+    $.ajax(('/associated_emails/' +
       $('.field-id > div > p').text() + '/'), {
         type: 'POST',
         success: this.merge_order
-      });
+      }
+    );
   },
 
   get_order: function() {
@@ -27,8 +28,6 @@ var OrderedList = Backbone.Model.extend({
 
   merge_order: function(json_list) {
     var order_list = this.get('order_list');
-    var additions = [];
-    var subtractions = [];
     var list = [];
 
     _.each(json_list, function(item) {
@@ -47,29 +46,41 @@ var OrderedList = Backbone.Model.extend({
     });
 
     this.set_order();
-    this.sort_and_set_emails();
-    //this.render_list();
+    this.sort_and_set_emails(json_list);
+    this.render_list();
   },
 
-  sort_and_set_emails: function() {
-    console.log(this.email_list);
+  sort_and_set_emails: function(json_list) {
     var order_list = this.get('order_list');
-    this.email_list.sort(function(email) {
-      return _.indexOf(order_list, email.pk)
+    this.email_list = json_list.sort(function(email) {
+        return _.indexOf(order_list, email.pk)
     });
   },
 
   render_list: function() {
     var view = { 'email': [] };
-    _.each(this.email_list, function(index, email) {
-      view.email.push({'id': $(email).val(), 'name':  $(email).text()});
+    _.each(this.email_list, function(email) {
+      view.email.push({'id': email.pk, 'name':  email.fields.subject});
     });
     if(view.email.length) {
-      $.post('/static/templates/email_list.html', function(mustache_template) {
-        $('#id_sortable_email').html(Mustache.render(mustache_template, view));
-        setup_sortable();
+      $.ajax('/static/templates/email_list.html', {
+        type: 'POST',
+        success: [
+          function(mustache_template) {
+            $('#id_sortable_email').html(Mustache.render(mustache_template, view));
+          },
+          setup_sortable
+        ]
       });
     }
+  },
+
+  resort: function(list) {
+    this.set('order_list', _.map(list, function(item) {
+      return parseInt(item.slice(9));
+      })
+    );
+    this.set_order();
   }
 });
 
@@ -89,29 +100,12 @@ $(document).ready(function() {
   }
 });
 
-
-
-function render_list() {
-  var view = { 'email': [] };
-  $('#id_emails option:selected').each(function(index, email) {
-    view.email.push({'id': $(email).val(), 'name':  $(email).text()});
-  });
-  if(view.email.length) {
-    $.post('/static/templates/email_list.html', function(mustache_template) {
-      $('#id_sortable_email').html(Mustache.render(mustache_template, view));
-      setup_sortable();
-    });
-  }
-}
-
 function setup_sortable() {
   $('#sortable').sortable();
   $('#sortable').disableSelection();
-  $('#id_email_order').text($('#sortable').sortable('serialize'));
-
   $('#sortable').sortable(
     { update: function(event, ui) {
-      $('#id_email_order').text($('#sortable').sortable('serialize'));
+      order_list.resort($('#sortable').sortable('toArray'));
     }
   });
 }
