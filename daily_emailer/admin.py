@@ -32,7 +32,7 @@ class CampaignAdmin(admin.ModelAdmin):
     class Media:
         js = (
             '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
-            'js/campaign_status.js',
+            'js/campaign.js',
         )
 
 admin.site.register(models.Email, EmailAdmin)
