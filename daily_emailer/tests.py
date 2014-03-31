@@ -3,8 +3,10 @@ import json
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
+from django.utils import timezone
 
 from daily_emailer import models, fields
+from daily_emailer.management.commands import send_daily_email
 
 class AjaxAssociatedEmailTests(TestCase):
 
@@ -45,14 +47,37 @@ class AjaxAssociatedEmailTests(TestCase):
         response = self.client.post('/associated_emails/1/')
         self.assertEqual(response.status_code, 404)
 
-'''May go away with custom field
-class OrderFieldTests(TestCase):
+class StatusFieldTests(TestCase):
 
     def setUp(self):
-        eq = models.EmailGroup(group_name='NewRep', email_order='3,4,1')
+        recipient = models.Recipient(first_name='John', last_name='Smith',
+                                     email='sample@email.com')
+        recipient.save()
+        eq = models.EmailGroup(group_name='NewRep')
         eq.save()
+        campaign = models.Campaign(reference_name='RefName',
+                                   status='{1: "2014-4-1", 2: "2014-4-2"}',
+                                   start_date=timezone.now(), email_group = eq,
+                                   recipient = recipient)
+        campaign.save()
 
-    def test_order_field_to_python(self):
-        email_group = models.EmailGroup.objects.all().filter(group_name='NewRep')
-        self.assertEqual(email_group[0].email_order, [3,4,1])
-'''
+    def test_status_field_to_python(self):
+        email_history = models.Campaign.objects.all().filter(reference_name='RefName')
+        self.assertEqual(email_history[0].status, {1: '2014-4-1', 2: '2014-4-2'})
+
+class SendDailyEmailTests(TestCase):
+
+    def setUp(self):
+        eq = models.EmailGroup(group_name='NewRep', email_order='3,1,2')
+        eq.save()
+        eq.email_set.create(subject='Subject1', message='Message1')
+        eq.email_set.create(subject='Subject2', message='Message2')
+        eq.email_set.create(subject='Subject3', message='Message3')
+        eq.save()
+        self.cmd = send_daily_email.Command()
+
+    def test_get_next_email(self):
+        email_order = models.EmailGroup.objects.get(group_name='NewRep')
+        emails = models.Email.objects.all().filter(email_group=email_order)
+        self.assertEqual(self.cmd.get_next_email(emails, [3,1,2],
+                         {3: '2014-4-1'}).pk, 1)

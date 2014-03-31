@@ -7,8 +7,8 @@ $(document).ready(function() {
   $('#id_status').hide();
   $('.field-id').hide();
 
-  if($('#id_reference_name').text().length) {
-    $(this).addClass('user-changed');
+  if($('#id_reference_name').val()) {
+    $('#id_reference_name').addClass('user-changed');
   }
   $('#id_reference_name').on('keyup keydown', function (e) {
     $(this).addClass('user-changed');

@@ -65,7 +65,7 @@ var OrderedList = Backbone.Model.extend({
     });
     if(view.email.length) {
       $.ajax('/static/templates/email_list.html', {
-        type: 'POST',
+        type: 'GET',
         success: [
           function(mustache_template) {
             $('#id_sortable_email').html(Mustache.render(mustache_template, view));
