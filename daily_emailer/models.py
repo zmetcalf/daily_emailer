@@ -31,8 +31,8 @@ class Campaign(models.Model):
     recipient = models.ForeignKey('Recipient')
     status = fields.StatusField(null=True, blank=True)
     reference_name = models.CharField(max_length=128)
-    start_date = models.DateTimeField()
-    completed_date = models.DateTimeField(null=True, blank=True)
+    start_date = models.DateField()
+    completed_date = models.DateField(null=True, blank=True)
 
     def __unicode__(self):
         return self.reference_name

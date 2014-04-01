@@ -13,7 +13,7 @@ class Command(BaseCommand):
             return
 
         for campaign in campaign_list:
-            if campaign.completed_date:
+            if self.get_ok_to_mail(campaign):
                 continue
 
             try:
@@ -38,6 +38,27 @@ class Command(BaseCommand):
             else:
                 campaign.completed_date = datetime.date.today()
             campaign.save()
+
+    def get_ok_to_mail(self, campaign):
+        if campaign.completed_date:
+            return False
+
+        if not campaign.status:
+            if (campaign.start_date - datetime.date.today()).days <= 0:
+                return True
+            else:
+                return False
+
+        last_date = datetime.date(1970, 01, 01)
+        for key, value in campaign.status.iteritems():
+            _value = datetime.datetime.strptime(value, "%Y-%m-%d").date()
+            if (last_date - _value).days < 0:
+                last_date = _value
+
+        if (last_date  - datetime.date.today()).days >= 0:
+            return False
+        else:
+            return True
 
     # If user adds or removes an email before sorting, it needs fixed
     def reconcile_emails(self, emails, email_order):

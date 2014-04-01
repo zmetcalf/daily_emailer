@@ -81,9 +81,10 @@ class SendDailyEmailTests(TestCase):
         eq.email_set.create(subject='Subject3', message='Message3')
         eq.save()
         campaign = models.Campaign(reference_name='RefName',
-                                   status='{3: "2014-4-1"}',
-                                   start_date=timezone.now(), email_group = eq,
-                                   recipient = recipient)
+                                   status="{3: '%s'}" % str(datetime.date.today()),
+                                   start_date=str(datetime.date.today()),
+                                   email_group=eq,
+                                   recipient=recipient)
         campaign.save()
         self.cmd = send_daily_email.Command()
 
@@ -119,6 +120,50 @@ class SendDailyEmailTests(TestCase):
         emails = models.Email.objects.all().filter(email_group=email_order)
         self.assertEqual(self.cmd.reconcile_emails(emails, [3,4,2]), [3,2,1])
 
+    def test_get_ok_to_mail_completed(self):
+        campaign = models.Campaign.objects.get(reference_name='RefName')
+        campaign.completed_date = str(datetime.date.today())
+        self.assertFalse(self.cmd.get_ok_to_mail(campaign))
+
+    def test_get_ok_to_mail_no_status_today(self):
+        campaign = models.Campaign.objects.get(reference_name='RefName')
+        campaign.status = ''
+        self.assertTrue(self.cmd.get_ok_to_mail(campaign))
+
+    def test_get_ok_to_mail_no_status_tomorrow(self):
+        campaign = models.Campaign.objects.get(reference_name='RefName')
+        campaign.status = ''
+        campaign.start_date += datetime.timedelta(days=1)
+        self.assertFalse(self.cmd.get_ok_to_mail(campaign))
+
+    def test_get_ok_to_mail_no_status_yesterday(self):
+        campaign = models.Campaign.objects.get(reference_name='RefName')
+        campaign.status = ''
+        campaign.start_date -= datetime.timedelta(days=1)
+        self.assertTrue(self.cmd.get_ok_to_mail(campaign))
+
+    def test_get_ok_to_mail_none_today(self):
+        campaign = models.Campaign.objects.get(reference_name='RefName')
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        campaign.status="{3: '%s'}" % str(yesterday)
+        self.assertTrue(self.cmd.get_ok_to_mail(campaign))
+
+    def test_get_ok_to_mail_none_today_or_day_before(self):
+        campaign = models.Campaign.objects.get(reference_name='RefName')
+        yesterday = datetime.date.today() - datetime.timedelta(days=2)
+        campaign.status="{3: '%s'}" % str(yesterday)
+        self.assertTrue(self.cmd.get_ok_to_mail(campaign))
+
+    def test_get_ok_to_mail_mailed_in_future(self):
+        campaign = models.Campaign.objects.get(reference_name='RefName')
+        yesterday = datetime.date.today() + datetime.timedelta(days=2)
+        campaign.status="{3: '%s'}" % str(yesterday)
+        self.assertFalse(self.cmd.get_ok_to_mail(campaign))
+
+    def test_get_ok_to_mail_mailed_today(self):
+        campaign = models.Campaign.objects.get(reference_name='RefName')
+        self.assertFalse(self.cmd.get_ok_to_mail(campaign))
+
     @unittest.skip('working on others')
     def test_handle_noargs_addition(self):
         self.cmd.handle_noargs()
@@ -137,7 +182,10 @@ class SendDailyEmailTests(TestCase):
         self.cmd.handle_noargs()
         campaign_list = models.Campaign.objects.all()
         self.assertEqual(campaign_list[0].status,
-                         {3: '2014-4-1', 1: str(datetime.date.today())})
+                         {
+                            3: str(datetime.date.today()),
+                            1: str(datetime.date.today())
+                          })
 
     @unittest.skip('working on others')
     def test_handle_noargs_add_and_sub(self):
