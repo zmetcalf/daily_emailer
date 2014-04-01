@@ -13,21 +13,22 @@ class Command(BaseCommand):
             return
 
         for campaign in campaign_list:
-            if self.get_ok_to_mail(campaign):
+            if not self.get_ok_to_mail(campaign):
                 continue
 
-            try:
-                emails = models.Email.objects.all().filter(
+            emails = models.Email.objects.all().filter(
                     email_group_id=campaign.email_group.pk)
-            except models.Email.DoesNotExist:
+
+            if not emails:
                 continue
 
             email_order = list(map(int, campaign.email_group.email_order.strip('[]').split(',')))
 
-            if len(email_order) != len(email_order):
-                email_order = self.reconcile_emails(emails,
-                                campaign.email_group.email_order)
-                campaign.email_group.email_order = email_order
+            email_order_sort = self.reconcile_emails(emails, list(email_order))
+
+            if email_order_sort != email_order:
+                email_order = email_order_sort
+                campaign.email_group.email_order = str(email_order).strip('[]').replace(' ', '')
                 campaign.email_group.save()
 
             next_email = self.get_next_email(emails, email_order, campaign.status)
@@ -39,6 +40,7 @@ class Command(BaseCommand):
                 campaign.completed_date = datetime.date.today()
             campaign.save()
 
+    # Check to see if completd or already sent that day
     def get_ok_to_mail(self, campaign):
         if campaign.completed_date:
             return False
