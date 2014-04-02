@@ -2,6 +2,8 @@
 *.pot
 *.pyc
 local_settings.py
+email_settings.py
 db.sqlite3
 
 /media
+/test_emails

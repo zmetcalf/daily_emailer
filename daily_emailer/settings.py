@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
@@ -87,3 +86,15 @@ STATICFILES_DIRS = (
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = 'media/'
+
+if DEBUG:
+    EMAIL_FROM_BLOCK = 'John Smith <jsmith@debug.com>'
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = '../test_emails'
+else:
+    try:
+        from email_settings import *
+    except ImportError:
+        pass
+
+SENDGRID = False

@@ -2,7 +2,7 @@ import datetime
 
 from django.core.management.base import BaseCommand, CommandError
 
-from daily_emailer import models
+from daily_emailer import models, utils
 
 class Command(BaseCommand):
     help = 'Handles sending out daily email'
@@ -34,7 +34,7 @@ class Command(BaseCommand):
             next_email = self.get_next_email(emails, email_order, campaign.status)
 
             if next_email:
-                self.send_email(next_email, campaign.recipient)
+                utils.send_email(next_email, campaign.recipient)
                 campaign.status[next_email.pk] = str(datetime.date.today())
             else:
                 campaign.completed_date = datetime.date.today()
@@ -82,6 +82,3 @@ class Command(BaseCommand):
                     if email.pk == ordered_email:
                         return email
         return False
-
-    def send_email(self, email, recipient):
-        pass

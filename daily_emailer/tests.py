@@ -3,12 +3,15 @@ import json
 import unittest
 
 from django.contrib.auth.models import User
+from django.core import mail
 from django.core.management.base import  CommandError
+from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
+from django.test.utils import override_settings
 from django.utils import timezone
 
-from daily_emailer import models, fields
+from daily_emailer import models, fields, utils
 from daily_emailer.management.commands import send_daily_email
 
 class AjaxAssociatedEmailTests(TestCase):
@@ -178,6 +181,7 @@ class SendDailyEmailTests(TestCase):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         self.assertEqual(campaign.status, {3: str(yesterday),
                                            1: str(datetime.date.today())})
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_handle_noargs_already_sent_today(self):
         self.cmd.handle_noargs()
@@ -252,3 +256,28 @@ class SendDailyEmailTests(TestCase):
         self.cmd.handle_noargs()
         campaign = models.Campaign.objects.get(reference_name='Success')
         self.assertEqual(campaign.completed_date, datetime.date.today())
+
+class UtilTests(TestCase):
+
+    def setUp(self):
+        self.recipient = models.Recipient(first_name='John', last_name='Smith',
+                                     email='sample@email.com')
+        self.email = models.Email(subject='Subject1', message='Message1')
+
+    def test_send_django_mail(self):
+        utils.send_email(self.email, self.recipient)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Subject1')
+        self.assertEqual(mail.outbox[0].body, 'Message1')
+        self.assertEqual(mail.outbox[0].to, ['John Smith <sample@email.com>',])
+
+    # TODO Find way to put SendGrid Info without leaving it in the repo
+    @unittest.skip('Test will send out emails')
+    @override_settings(DEBUG=False)
+    @override_settings(SENDGRID=True)
+    @override_settings(SENDGRID_USERNAME='')
+    @override_settings(SENDGRID_PASSWORD='')
+    def test_sendgrid_mail(self):
+        self.recipient.email = 'sample@email.com'
+        utils.send_email(self.email, self.recipient)
+
