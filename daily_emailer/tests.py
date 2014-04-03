@@ -4,6 +4,7 @@ import unittest
 
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management.base import  CommandError
 from django.conf import settings
 from django.test import TestCase
@@ -271,6 +272,41 @@ class UtilTests(TestCase):
         self.assertEqual(mail.outbox[0].body, 'Message1')
         self.assertEqual(mail.outbox[0].to, ['John Smith <sample@email.com>',])
 
+    # Creates a folders in media /media/email_attachments/2014/XX/XX/
+    def test_attachment_send_django_email(self):
+        eg = models.EmailGroup(group_name='NewRep', email_order='3,1,2')
+        eg.save()
+        eg.email_set.create(subject='Subject1', message='Message1')
+        eg.save()
+        email = models.Email.objects.get(subject='Subject1')
+        email.save()
+        attachment = email.attachment_set.create(file_name='TestFile',
+            attachment=SimpleUploadedFile('Test.docx', 'File Contents'))
+        email.save()
+        utils.send_email(email, self.recipient)
+        self.assertEqual(mail.outbox[0].attachments,
+                         [('TestFile', 'File Contents', None)])
+        models.Attachment.objects.get(pk=1).attachment.delete()
+
+    @unittest.skip('Creates a file /media/email_attachments/2014/XX/XX/Test.docx')
+    @override_settings(DEBUG=False)
+    @override_settings(SENDGRID=True)
+    @override_settings(SENDGRID_USERNAME='')
+    @override_settings(SENDGRID_PASSWORD='')
+    def test_sendgrid_attachment_email(self):
+        eg = models.EmailGroup(group_name='NewRep', email_order='3,1,2')
+        eg.save()
+        eg.email_set.create(subject='Subject1', message='Message1')
+        eg.save()
+        email = models.Email.objects.get(subject='Subject1')
+        email.save()
+        email.attachment_set.create(file_name='TestFile',
+            attachment=SimpleUploadedFile('Test.docx', 'File Contents'))
+        email.save()
+        self.recipient.email = 'john@email.com'
+        utils.send_email(email, self.recipient)
+        models.Attachment.objects.get(pk=1).attachment.delete()
+
     # TODO Find way to put SendGrid Info without leaving it in the repo
     @unittest.skip('Test will send out emails')
     @override_settings(DEBUG=False)
@@ -280,4 +316,3 @@ class UtilTests(TestCase):
     def test_sendgrid_mail(self):
         self.recipient.email = 'sample@email.com'
         utils.send_email(self.email, self.recipient)
-
