@@ -28,7 +28,8 @@ def send_sendgrid_mail(email,  addressee, attachments):
     if attachments:
         for doc in attachments:
             try:
-                message.add_attachment_stream(doc.file_name,
+                file_name = doc.attachment.name.split('/')
+                message.add_attachment_stream(file_name.pop(),
                     BytesIO(doc.attachment.read()))
                 doc.attachment.close()
             except IOError:
@@ -43,7 +44,8 @@ def send_django_mail(email, addressee, attachments):
     if attachments:
         for doc in attachments:
             try:
-                email.attach(doc.file_name, doc.attachment.read())
+                file_name = doc.attachment.name.split('/')
+                email.attach(file_name.pop(), doc.attachment.read())
                 doc.attachment.close()
             except IOError:
                 pass # TODO Add to body that attachements have been removed

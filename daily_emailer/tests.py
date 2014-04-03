@@ -285,7 +285,7 @@ class UtilTests(TestCase):
         email.save()
         utils.send_email(email, self.recipient)
         self.assertEqual(mail.outbox[0].attachments,
-                         [('TestFile', 'File Contents', None)])
+                         [('Test.docx', 'File Contents', None)])
         models.Attachment.objects.get(pk=1).attachment.delete()
 
     @unittest.skip('Creates a file /media/email_attachments/2014/XX/XX/Test.docx')
