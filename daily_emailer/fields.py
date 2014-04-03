@@ -34,7 +34,7 @@ class StatusField(models.TextField):
 
     def to_python(self, value):
         if value == None or value == '':
-            return []
+            return {}
 
         if isinstance(value, MutableMapping):
             return value
