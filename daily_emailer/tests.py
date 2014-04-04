@@ -176,28 +176,28 @@ class SendDailyEmailTests(TestCase):
         campaign = models.Campaign.objects.get(reference_name='RefName')
         self.assertFalse(self.cmd.get_ok_to_mail(campaign))
 
-    def test_handle_noargs_success(self):
-        self.cmd.handle_noargs()
+    def test_handle_success(self):
+        self.cmd.execute()
         campaign = models.Campaign.objects.get(reference_name='Success')
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         self.assertEqual(campaign.status, {3: str(yesterday),
                                            1: str(datetime.date.today())})
         self.assertEqual(len(mail.outbox), 1)
 
-    def test_handle_noargs_already_sent_today(self):
-        self.cmd.handle_noargs()
+    def test_handle_already_sent_today(self):
+        self.cmd.execute()
         campaign = models.Campaign.objects.get(reference_name='RefName')
         self.assertEqual(campaign.status, {3: str(datetime.date.today())})
 
-    def test_handle_noargs_no_emails(self):
+    def test_handle_no_emails(self):
         campaign = models.Campaign.objects.get(reference_name='Success')
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         emails = models.Email.objects.all().delete()
-        self.cmd.handle_noargs()
+        self.cmd.execute()
         campaign = models.Campaign.objects.get(reference_name='Success')
         self.assertEqual(campaign.status, {3: str(yesterday)})
 
-    def test_handle_noargs_additional_emails(self):
+    def test_handle_additional_emails(self):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         campaign = models.Campaign.objects.get(reference_name='Success')
         eg = models.EmailGroup.objects.get(pk=campaign.email_group.pk)
@@ -207,14 +207,14 @@ class SendDailyEmailTests(TestCase):
         self.assertEqual(campaign.email_group.email_order, '3,1')
         campaign.status = {3: str(yesterday), 1: str(yesterday)}
         campaign.save()
-        self.cmd.handle_noargs()
+        self.cmd.execute()
         campaign = models.Campaign.objects.get(reference_name='Success')
         self.assertEqual(campaign.email_group.email_order, '3,1,2')
         self.assertEqual(campaign.status, {3: str(yesterday),
                                            1: str(yesterday),
                                            2: str(datetime.date.today())})
 
-    def test_handle_noargs_less_emails(self):
+    def test_handle_less_emails(self):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         campaign = models.Campaign.objects.get(reference_name='Success')
         eg = models.EmailGroup.objects.get(pk=campaign.email_group.pk)
@@ -224,14 +224,14 @@ class SendDailyEmailTests(TestCase):
         self.assertEqual(campaign.email_group.email_order, '3,1,2,4')
         campaign.status = {3: str(yesterday), 1: str(yesterday)}
         campaign.save()
-        self.cmd.handle_noargs()
+        self.cmd.execute()
         campaign = models.Campaign.objects.get(reference_name='Success')
         self.assertEqual(campaign.email_group.email_order, '3,1,2')
         self.assertEqual(campaign.status, {3: str(yesterday),
                                            1: str(yesterday),
                                            2: str(datetime.date.today())})
 
-    def test_handle_noargs_more_and_less_emails(self):
+    def test_handle_more_and_less_emails(self):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         campaign = models.Campaign.objects.get(reference_name='Success')
         eg = models.EmailGroup.objects.get(pk=campaign.email_group.pk)
@@ -241,20 +241,20 @@ class SendDailyEmailTests(TestCase):
         self.assertEqual(campaign.email_group.email_order, '3,1,4')
         campaign.status = {3: str(yesterday), 1: str(yesterday)}
         campaign.save()
-        self.cmd.handle_noargs()
+        self.cmd.execute()
         campaign = models.Campaign.objects.get(reference_name='Success')
         self.assertEqual(campaign.email_group.email_order, '3,1,2')
         self.assertEqual(campaign.status, {3: str(yesterday),
                                            1: str(yesterday),
                                            2: str(datetime.date.today())})
 
-    def test_handle_noargs_completed(self):
+    def test_handle_completed(self):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         campaign = models.Campaign.objects.get(reference_name='Success')
         campaign.status = {3: str(yesterday), 1: str(yesterday),
                            2: str(yesterday)}
         campaign.save()
-        self.cmd.handle_noargs()
+        self.cmd.execute()
         campaign = models.Campaign.objects.get(reference_name='Success')
         self.assertEqual(campaign.completed_date, datetime.date.today())
 

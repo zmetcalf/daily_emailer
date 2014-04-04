@@ -90,7 +90,7 @@ MEDIA_ROOT = 'media/'
 if DEBUG:
     EMAIL_FROM_BLOCK = 'John Smith <jsmith@debug.com>'
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = '../test_emails'
+    EMAIL_FILE_PATH = 'test_emails'
 else:
     try:
         from email_settings import *

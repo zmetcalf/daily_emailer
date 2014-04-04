@@ -5,9 +5,10 @@ from django.core.management.base import BaseCommand, CommandError
 from daily_emailer import models, utils
 
 class Command(BaseCommand):
+    args = 'Takes no arguments'
     help = 'Handles sending out daily email'
 
-    def handle_noargs(self):
+    def handle(self, *args, **options):
         campaign_list = models.Campaign.objects.all()
         if not campaign_list:
             return
@@ -35,6 +36,11 @@ class Command(BaseCommand):
 
             if next_email:
                 utils.send_email(next_email, campaign.recipient)
+                self.stdout.write(('Sent {0} to {1} {2} at {3}\n'.format(
+                            next_email.subject,
+                            campaign.recipient.first_name,
+                            campaign.recipient.last_name,
+                            campaign.recipient.email)))
                 campaign.status[next_email.pk] = str(datetime.date.today())
             else:
                 campaign.completed_date = datetime.date.today()
@@ -51,7 +57,7 @@ class Command(BaseCommand):
             else:
                 return False
 
-        last_date = datetime.date(1970, 01, 01)
+        last_date = datetime.date(1970, 1, 1)
         for key, value in campaign.status.iteritems():
             _value = datetime.datetime.strptime(value, "%Y-%m-%d").date()
             if (last_date - _value).days < 0:

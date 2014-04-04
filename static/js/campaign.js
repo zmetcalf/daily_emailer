@@ -23,7 +23,7 @@ function set_reference_name() {
     $('#id_reference_name').val((d.getMonth()+1) + '-' + d.getDate()
                                   + '-' + d.getFullYear() + ' - ' +
                                   $('#id_email_group option:selected').text() +
-                                  '-' + $('#id_recipient option:selected').text()
+                                  ' - ' + $('#id_recipient option:selected').text()
                                  );
 
   }
