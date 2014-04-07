@@ -4,9 +4,14 @@ $(document).ready(function() {
       xhr.setRequestHeader('X-CSRFToken', $('input[name="csrfmiddlewaretoken"]').val());
     }
   });
-  $('#id_status').hide();
+
+  // Add and remove fields
+  $('.field-status > div > p').hide();
+  $('.field-status').before('<div id="id_status"></div>');
+  // show_status();
   $('.field-id').hide();
 
+  // Create default reference name
   if($('#id_reference_name').val()) {
     $('#id_reference_name').addClass('user-changed');
   }
@@ -25,6 +30,20 @@ function set_reference_name() {
                                   $('#id_email_group option:selected').text() +
                                   ' - ' + $('#id_recipient option:selected').text()
                                  );
-
   }
+}
+
+function show_status() {
+  $.ajax(('/campaign_emails/' +
+    $('.field-id > div > p').text() + '/'), {
+      type: 'POST',
+      success: function() {}
+    }
+  );
+  $.ajax('/static/templates/status.html', {
+    type: 'GET',
+    success: function(mustache_template) {
+      $('#id_status').html(Mustache.render(mustache_template, view));
+    }
+  });
 }

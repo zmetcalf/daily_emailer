@@ -14,6 +14,8 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^associated_emails/(?P<group_id>\d+)/$',
         'daily_emailer.views.ajax_associated_emails'),
+    url(r'^campaign_emails/(?P<campaign>\d+)/$',
+        'daily_emailer.views.ajax_campaign_emails'),
     url(r'^js_tests/', 'daily_emailer.views.js_tests'),
 )
 
