@@ -1,3 +1,5 @@
+var email_collection = new Backbone.Collection();
+
 $(document).ready(function() {
   $.ajaxSetup({
     beforeSend: function(xhr, settings) {
@@ -5,11 +7,12 @@ $(document).ready(function() {
     }
   });
 
+
   // Add and remove fields
   $('.field-status > div > p').hide();
-  $('.field-status').before('<div id="id_status"></div>');
-  // show_status();
+  $('.field-status').after('<div id="id_status"></div>');
   $('.field-id').hide();
+  show_status();
 
   // Create default reference name
   if($('#id_reference_name').val()) {
@@ -37,9 +40,35 @@ function show_status() {
   $.ajax(('/campaign_emails/' +
     $('.field-id > div > p').text() + '/'), {
       type: 'POST',
-      success: function() {}
+      success: [
+        function(email_list) {
+          _.each(email_list, function(email) {
+            email_collection.add(email);
+          });
+        },
+        render_status
+      ]
     }
   );
+}
+
+function render_status() {
+  var view = { 'email': [] };
+  var sent_emails = eval("(" + $('.field-status > div > p').text() + ")");
+  email_collection.each(function(email) {
+    var sent = false;
+
+    var key = _.find(_.keys(sent_emails), function(key) {
+      return key == email.get('pk');
+    });
+
+    if(key) {
+      sent = sent_emails[key];
+    }
+
+    view.email.push({ 'name': email.get('fields').subject, 'date_sent': sent });
+  });
+
   $.ajax('/static/templates/status.html', {
     type: 'GET',
     success: function(mustache_template) {
