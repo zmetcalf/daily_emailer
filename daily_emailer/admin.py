@@ -10,7 +10,8 @@ class EmailAdmin(admin.ModelAdmin):
     inlines = [AttachmentInline,]
 
 class EmailGroupAdmin(admin.ModelAdmin):
-    readonly_fields = ('id',)
+    readonly_fields = ()
+    exclude = ()
 
     class Media:
         css = {
@@ -26,8 +27,19 @@ class EmailGroupAdmin(admin.ModelAdmin):
             'js/email_sort.js',
         )
 
+    def get_form(self, request, obj=None, **kwargs):
+        if not obj:
+            self.exclude = ('email_order', 'id',)
+        return super(EmailGroupAdmin, self).get_form(request, obj, **kwargs)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return self.readonly_fields + ('id',)
+        return self.readonly_fields
+
 class CampaignAdmin(admin.ModelAdmin):
-    readonly_fields = ('id','status',)
+    readonly_fields = ()
+    exclude = ()
 
     class Media:
         css = {
@@ -42,9 +54,14 @@ class CampaignAdmin(admin.ModelAdmin):
             'js/campaign.js',
         )
 
+    def get_form(self, request, obj=None, **kwargs):
+        if not obj:
+            self.exclude = ('status',)
+        return super(CampaignAdmin, self).get_form(request, obj, **kwargs)
+
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return self.readonly_fields + ('email_group', 'recipient')
+            return self.readonly_fields + ('email_group', 'id', 'status', 'recipient',)
         return self.readonly_fields
 
 admin.site.register(models.Email, EmailAdmin)

@@ -21,7 +21,7 @@ class Email(models.Model):
 
 class EmailGroup(models.Model):
     group_name = models.CharField(max_length=50)
-    email_order = fields.OrderField(null=True, blank=True)
+    email_order = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         return self.group_name
