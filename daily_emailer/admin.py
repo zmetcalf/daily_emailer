@@ -33,7 +33,7 @@ class EmailGroupAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = ()
         if not obj:
-            self.exclude = ('email_order', 'id',)
+            self.exclude = ('email_order',)
         return super(EmailGroupAdmin, self).get_form(request, obj, **kwargs)
 
     def get_readonly_fields(self, request, obj=None):
