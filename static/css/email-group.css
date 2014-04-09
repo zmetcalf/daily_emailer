@@ -1,0 +1,10 @@
+#sortable li {
+  list-style-type: none;
+  max-width: 50%;
+  padding: 0.6em 1.4em;
+}
+
+#sortable li span {
+  position: absolute;
+  margin-left: -1.3em;
+}

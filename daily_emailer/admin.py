@@ -15,7 +15,10 @@ class EmailGroupAdmin(admin.ModelAdmin):
 
     class Media:
         css = {
-            'all': ('//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/css/jquery-ui.min.css',)
+            'all': (
+                '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/css/jquery-ui.min.css',
+                'css/email-group.css',
+            )
         }
         js = (
             '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
@@ -28,6 +31,7 @@ class EmailGroupAdmin(admin.ModelAdmin):
         )
 
     def get_form(self, request, obj=None, **kwargs):
+        self.exclude = ()
         if not obj:
             self.exclude = ('email_order', 'id',)
         return super(EmailGroupAdmin, self).get_form(request, obj, **kwargs)
@@ -43,11 +47,10 @@ class CampaignAdmin(admin.ModelAdmin):
 
     class Media:
         css = {
-            'all': ('//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css',)
+            'all': ('css/campaign.css',)
         }
         js = (
             '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
-            '//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js',
             '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js',
             '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js',
             '//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js',
@@ -55,6 +58,7 @@ class CampaignAdmin(admin.ModelAdmin):
         )
 
     def get_form(self, request, obj=None, **kwargs):
+        self.exclude = ()
         if not obj:
             self.exclude = ('status',)
         return super(CampaignAdmin, self).get_form(request, obj, **kwargs)

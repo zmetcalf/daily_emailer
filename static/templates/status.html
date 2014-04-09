@@ -1,12 +1,14 @@
 <div>
+<ul>
 {{#email}}
 {{#date_sent}}
-<div class="panel panel-success"><h3>{{name}} - <small>{{date_sent}}</small></h3></div>
+<li><h3 class='sent-email'>{{name}} - {{date_sent}}</h3></li>
 {{/date_sent}}
 {{/email}}
 {{#email}}
 {{^date_sent}}
-<div class="panel panel-warning"><h3>{{name}} - <small>Not Sent</small></h3></div>
+<li><h3 class='unsent-email'>{{name}} - Not Sent</h3></li>
 {{/date_sent}}
 {{/email}}
+</ul>
 </div>

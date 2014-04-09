@@ -10,7 +10,7 @@ $(document).ready(function() {
 
   // Add and remove fields
   $('.field-status > div > p').hide();
-  $('.field-status').after('<div id="id_status"></div>');
+  $('.field-status > div > label').after('<div id="id_status"></div>');
   $('.field-id').hide();
   show_status();
 
