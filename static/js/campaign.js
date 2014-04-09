@@ -12,7 +12,9 @@ $(document).ready(function() {
   $('.field-status > div > p').hide();
   $('.field-status > div > label').after('<div id="id_status"></div>');
   $('.field-id').hide();
-  show_status();
+  if($('.field-id > div > p').text()) {
+    show_status();
+  }
 
   // Create default reference name
   if($('#id_reference_name').val()) {
