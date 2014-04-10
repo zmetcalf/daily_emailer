@@ -23,7 +23,10 @@ class Command(BaseCommand):
             if not emails:
                 continue
 
-            email_order = list(map(int, campaign.email_group.email_order.strip('[]').split(',')))
+            if campaign.email_group.email_order:
+                email_order = list(map(int, campaign.email_group.email_order.strip('[]').split(',')))
+            else:
+                email_order = []
 
             email_order_sort = self.reconcile_emails(emails, list(email_order))
 
@@ -41,7 +44,7 @@ class Command(BaseCommand):
                             campaign.recipient.first_name,
                             campaign.recipient.last_name,
                             campaign.recipient.email)))
-                campaign.status[next_email.pk] = str(datetime.date.today())
+                campaign.status[int(next_email.pk)] = str(datetime.date.today())
             else:
                 campaign.completed_date = datetime.date.today()
             campaign.save()
