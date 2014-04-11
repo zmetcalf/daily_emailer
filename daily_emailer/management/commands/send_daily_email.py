@@ -77,7 +77,7 @@ class Command(BaseCommand):
         for email in emails:
             email_pk_list.append(email.pk)
             if not email.pk in email_order:
-                email_order.append(email.pk)
+                email_order.append(int(email.pk))
         for list_item in email_order:
            if not list_item in email_pk_list:
               email_order.remove(list_item)
