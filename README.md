@@ -13,9 +13,9 @@ Finally, create a campaign to tie the recipient and email group together.
 A cron job will be necessary to tell the program to send out emails. Daily emailer can only send out one email per campaign per day. So you can set your cron job to be more restrictive than that (once per week, once per month, etc.)
 
 A sample cron job looks like this:
-'''
+```
 0 11 * * 4,5 /path/to/python/in/virtualenv/python /path/to/installation/manage.py send_daily_email
-'''
+```
 This would send the emails on Thursday and Friday at 11:00 am.
 
 ## Installation
@@ -28,10 +28,10 @@ A seperate file, email_settings.py, is suggested for putting SMTP (https://docs.
 
 For SendGrid, add these settings and change SENDGRID to True
 
-'''python
+```python
 SENDGRID_USERNAME = 'yoursendgridusername'
 SENDGRID_PASSWORD = 'yoursendgridpassword'
-'''
+```
 
 Change Debug to False in your settings.py file to send live emails.
 
