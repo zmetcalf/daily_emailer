@@ -9,6 +9,13 @@ class AttachmentInline(admin.TabularInline):
 class EmailAdmin(admin.ModelAdmin):
     inlines = [AttachmentInline,]
 
+    class Media:
+        js = (
+            '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
+            'js/email.js',
+            '//cdnjs.cloudflare.com/ajax/libs/ckeditor/4.3.2/ckeditor.min.js',
+        )
+
 class EmailGroupAdmin(admin.ModelAdmin):
     readonly_fields = ()
     exclude = ()
