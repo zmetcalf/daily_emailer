@@ -13,7 +13,7 @@ class EmailAdmin(admin.ModelAdmin):
         js = (
             '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
             'js/email.js',
-            '//cdnjs.cloudflare.com/ajax/libs/ckeditor/4.3.2/ckeditor.min.js',
+            '//tinymce.cachefly.net/4.0/tinymce.min.js',
         )
 
 class EmailGroupAdmin(admin.ModelAdmin):
