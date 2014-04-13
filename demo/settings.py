@@ -47,9 +47,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'daily_emailer.urls'
+ROOT_URLCONF = 'demo.urls'
 
-WSGI_APPLICATION = 'daily_emailer.wsgi.application'
+WSGI_APPLICATION = 'demo.wsgi.application'
 
 
 # Database

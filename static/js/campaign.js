@@ -39,7 +39,7 @@ function set_reference_name() {
 }
 
 function show_status() {
-  $.ajax(('/campaign_emails/' +
+  $.ajax(('/daily_emailer/campaign_emails/' +
     $('.field-id > div > p').text() + '/'), {
       type: 'POST',
       success: [

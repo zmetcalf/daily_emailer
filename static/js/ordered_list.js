@@ -6,7 +6,7 @@ var OrderedList = Backbone.Model.extend({
     _.bindAll(this, 'merge_order');
 
     this.get_order();
-    $.ajax(('/associated_emails/' +
+    $.ajax(('/daily_emailer/associated_emails/' +
       $('.field-id > div > p').text() + '/'), {
         type: 'POST',
         success: this.merge_order

@@ -33,6 +33,11 @@ SENDGRID_USERNAME = 'yoursendgridusername'
 SENDGRID_PASSWORD = 'yoursendgridpassword'
 ```
 
+Add daily emailer urls to your urls.py file:
+
+```python
+url(r'^daily_emailer/', include('daily_emailer.urls')),
+```
 Change Debug to False in your settings.py file to send live emails.
 
 For email attachments, make sure you have a media file with correct permissions.

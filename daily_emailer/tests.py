@@ -31,7 +31,7 @@ class AjaxAssociatedEmailTests(TestCase):
 
     def test_ajax_associated_emails(self):
         self.client.login(username='Admin', password='password')
-        response = self.client.post('/associated_emails/1/')
+        response = self.client.post('/daily_emailer/associated_emails/1/')
         data = json.loads(response.content)
         self.assertEqual(data[0]['pk'], 1)
         self.assertEqual(data[0]['fields']['message'], 'Message1')
@@ -40,18 +40,18 @@ class AjaxAssociatedEmailTests(TestCase):
 
     def test_ajax_associated_emails_authenticated_empty(self):
         self.client.login(username='Admin', password='password')
-        response = self.client.post('/associated_emails/2/')
+        response = self.client.post('/daily_emailer/associated_emails/2/')
         data = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, [])
 
     def test_ajax_associated_emails_authenticated(self):
         self.client.login(username='Admin', password='password')
-        response = self.client.post('/associated_emails/1/')
+        response = self.client.post('/daily_emailer/associated_emails/1/')
         self.assertEqual(response.status_code, 200)
 
     def test_ajax_associated_emails_unauthenticated(self):
-        response = self.client.post('/associated_emails/1/')
+        response = self.client.post('/daily_emailer/associated_emails/1/')
         self.assertEqual(response.status_code, 404)
 
 class AjaxCampaignEmailsTests(TestCase):
@@ -78,7 +78,7 @@ class AjaxCampaignEmailsTests(TestCase):
 
     def test_ajax_campaign_emails(self):
         self.client.login(username='Admin', password='password')
-        response = self.client.post('/campaign_emails/1/')
+        response = self.client.post('/daily_emailer/campaign_emails/1/')
         data = json.loads(response.content)
         self.assertEqual(data[0]['pk'], 1)
         self.assertEqual(data[0]['fields']['message'], 'Message1')
@@ -87,18 +87,18 @@ class AjaxCampaignEmailsTests(TestCase):
 
     def test_ajax_campaign_emails_authenticated_empty(self):
         self.client.login(username='Admin', password='password')
-        response = self.client.post('/campaign_emails/2/')
+        response = self.client.post('/daily_emailer/campaign_emails/2/')
         data = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data, [])
 
     def test_ajax_campaign_emails_authenticated(self):
         self.client.login(username='Admin', password='password')
-        response = self.client.post('/campaign_emails/1/')
+        response = self.client.post('/daily_emailer/campaign_emails/1/')
         self.assertEqual(response.status_code, 200)
 
     def test_ajax_campaign_emails_unauthenticated(self):
-        response = self.client.post('/campaign_emails/1/')
+        response = self.client.post('/daily_emailer/campaign_emails/1/')
         self.assertEqual(response.status_code, 404)
 
 class StatusFieldTests(TestCase):
