@@ -8,6 +8,7 @@ class AttachmentInline(admin.TabularInline):
 
 class EmailAdmin(admin.ModelAdmin):
     inlines = [AttachmentInline,]
+    list_display = ('__str__', 'email_group')
 
     class Media:
         js = (
@@ -49,8 +50,9 @@ class EmailGroupAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 class CampaignAdmin(admin.ModelAdmin):
-    readonly_fields = ()
+    list_display = ('__str__', 'recipient', 'start_date', 'completed_date')
     exclude = ()
+    readonly_fields = ()
 
     class Media:
         css = {
@@ -75,7 +77,10 @@ class CampaignAdmin(admin.ModelAdmin):
             return self.readonly_fields + ('email_group', 'id', 'status', 'recipient',)
         return self.readonly_fields
 
+class RecipientAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'email')
+
 admin.site.register(models.Email, EmailAdmin)
 admin.site.register(models.EmailGroup, EmailGroupAdmin)
 admin.site.register(models.Campaign, CampaignAdmin)
-admin.site.register(models.Recipient)
+admin.site.register(models.Recipient, RecipientAdmin)
