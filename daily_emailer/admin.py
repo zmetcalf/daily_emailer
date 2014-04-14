@@ -13,7 +13,7 @@ class EmailAdmin(admin.ModelAdmin):
     class Media:
         js = (
             '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
-            'js/email.js',
+            'daily_emailer/js/email.js',
             '//tinymce.cachefly.net/4.0/tinymce.min.js',
         )
 
@@ -25,7 +25,7 @@ class EmailGroupAdmin(admin.ModelAdmin):
         css = {
             'all': (
                 '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/css/jquery-ui.min.css',
-                'css/email-group.css',
+                'daily_emailer/css/email-group.css',
             )
         }
         js = (
@@ -34,8 +34,8 @@ class EmailGroupAdmin(admin.ModelAdmin):
             '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js',
             '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js',
             '//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js',
-            'js/ordered_list.js',
-            'js/email_sort.js',
+            'daily_emailer/js/ordered_list.js',
+            'daily_emailer/js/email_sort.js',
         )
 
     def get_form(self, request, obj=None, **kwargs):
@@ -56,14 +56,14 @@ class CampaignAdmin(admin.ModelAdmin):
 
     class Media:
         css = {
-            'all': ('css/campaign.css',)
+            'all': ('daily_emailer/css/campaign.css',)
         }
         js = (
             '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
             '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js',
             '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js',
             '//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js',
-            'js/campaign.js',
+            'daily_emailer/js/campaign.js',
         )
 
     def get_form(self, request, obj=None, **kwargs):

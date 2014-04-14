@@ -64,7 +64,7 @@ var OrderedList = Backbone.Model.extend({
       view.email.push({'id': email.pk, 'name':  email.fields.subject});
     });
     if(view.email.length) {
-      $.ajax('/static/templates/email_list.html', {
+      $.ajax('/static/daily_emailer/templates/email_list.html', {
         type: 'GET',
         success: [
           function(mustache_template) {
