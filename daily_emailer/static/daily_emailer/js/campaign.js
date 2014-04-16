@@ -71,7 +71,7 @@ function render_status() {
     view.email.push({ 'name': email.get('fields').subject, 'date_sent': sent });
   });
 
-  $.ajax('/static/daily_emailer/templates/status.html', {
+  $.ajax('/daily_emailer/mustache_template/status.html', {
     type: 'GET',
     success: function(mustache_template) {
       $('#id_status').html(Mustache.render(mustache_template, view));

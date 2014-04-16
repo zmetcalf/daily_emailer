@@ -26,5 +26,9 @@ def ajax_campaign_emails(request, campaign):
     data = serializers.serialize('json', emails)
     return HttpResponse(data, content_type='application/json')
 
+def ajax_get_mustache_template(request, template):
+    template = open('daily_emailer/templates/daily_emailer/mustache/{0}'.format(template), 'rb')
+    return HttpResponse(template, content_type='text/plain')
+
 def js_tests(request):
     return render(request, 'daily_emailer/js_tests.html')
