@@ -96,5 +96,3 @@ else:
         from email_settings import *
     except ImportError:
         pass
-
-SENDGRID = False

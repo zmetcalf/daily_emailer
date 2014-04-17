@@ -11,7 +11,9 @@ def send_email(_email, recipient):
                                recipient.email)
     attachments = Attachment.objects.all().filter(email=_email)
 
-    if settings.SENDGRID:
+    sendgrid = getattr(settings, 'SENDGRID', False)
+
+    if sendgrid:
         send_sendgrid_mail(_email,  addressee, attachments)
     else:
         send_django_mail(_email, addressee, attachments)

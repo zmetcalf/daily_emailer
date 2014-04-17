@@ -34,18 +34,13 @@ $ pip install git+https://github.com/zmetcalf/daily_emailer.git
 ```
 Add 'daily_emailer' to INSTALLED_APPS.
 
-SendGrid is not a requirement; however, you must include a setting in your settings.py:
-
-```python
-SENDGRID = False
-```
-
 If you are using the demo, a seperate file, email_settings.py, is suggested for putting SMTP (https://docs.djangoproject.com/en/dev/topics/email/#smtp-backend) or SendGrid settings.
 You can also just include these settings in your settings.py file.
 
-For SendGrid, add these settings and set SENDGRID to True
+SendGrid is not a requirement but to enable it, add these settings:
 
 ```python
+SENDGRID = True
 SENDGRID_USERNAME = 'yoursendgridusername'
 SENDGRID_PASSWORD = 'yoursendgridpassword'
 ```
