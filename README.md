@@ -21,6 +21,9 @@ A sample cron job looks like this:
 ```
 This would send the emails on Thursday and Friday at 11:00 am.
 
+Finally, you must be able to trust staff with this module because they can
+upload any file and send it out to any email address.
+
 ## Installation
 
 Daily emailer was developed with django 1.6.2, and it has only been tested with this version.
