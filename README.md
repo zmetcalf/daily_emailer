@@ -37,6 +37,12 @@ $ pip install git+https://github.com/zmetcalf/daily_emailer.git
 ```
 Add 'daily_emailer' to INSTALLED_APPS.
 
+Add your from address:
+
+```python
+EMAIL_FROM_BLOCK = 'John Smith <jsmith@debug.com>'
+```
+
 If you are using the demo, a seperate file, email_settings.py, is suggested for putting SMTP (https://docs.djangoproject.com/en/dev/topics/email/#smtp-backend) or SendGrid settings.
 You can also just include these settings in your settings.py file.
 
