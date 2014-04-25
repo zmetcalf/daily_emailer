@@ -3,6 +3,10 @@ from collections import MutableMapping
 
 from django.db import models
 
+from south.modelsinspector import add_introspection_rules
+
+add_introspection_rules([], ["^daily_emailer\.fields\.StatusField"])
+
 class StatusField(models.TextField):
 
     description = 'Tracks which emails have been sent.'

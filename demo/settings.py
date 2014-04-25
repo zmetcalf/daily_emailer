@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'daily_emailer',
+    'south',
 )
 
 MIDDLEWARE_CLASSES = (
