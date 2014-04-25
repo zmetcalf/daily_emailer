@@ -9,5 +9,9 @@ setup(name='daily_emailer',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires=['django>=1.6.2', 'sendgrid>=0.3.5'],
+      install_requires=[
+        'django>=1.6.2',
+        'sendgrid>=0.3.5',
+        'south',
+        ],
      )

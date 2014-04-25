@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 from daily_emailer import fields
@@ -19,6 +21,10 @@ class Email(models.Model):
         return (self.subject[:50] + '...') if len(self.subject) > 50 \
                                            else self.subject
 
+class SentEmail(models.Model):
+    email = models.ForeignKey('Email')
+    sent_date = models.DateField(auto_now=True)
+
 class EmailGroup(models.Model):
     group_name = models.CharField(max_length=50)
     email_order = models.TextField(null=True, blank=True)
@@ -29,7 +35,7 @@ class EmailGroup(models.Model):
 class Campaign(models.Model):
     email_group = models.ForeignKey('EmailGroup')
     recipient = models.ForeignKey('Recipient')
-    status = fields.StatusField(null=True, blank=True)
+    sent_date = models.ForeignKey('SentEmail')
     reference_name = models.CharField(max_length=128)
     start_date = models.DateField()
     completed_date = models.DateField(null=True, blank=True)
