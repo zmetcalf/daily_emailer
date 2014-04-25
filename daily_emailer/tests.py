@@ -312,6 +312,12 @@ class UtilTests(TestCase):
                                      email='sample@email.com')
         self.email = models.Email(subject='Subject1', message='Message1')
 
+    def tearDown(self):
+        try:
+            models.Attachment.objects.get(pk=1).attachment.delete()
+        except:
+            pass
+
     def test_send_django_mail(self):
         utils.send_email(self.email, self.recipient)
         self.assertEqual(len(mail.outbox), 1)
@@ -333,7 +339,6 @@ class UtilTests(TestCase):
         utils.send_email(email, self.recipient)
         self.assertEqual(mail.outbox[0].attachments,
                          [('Test.docx', 'File Contents', None)])
-        models.Attachment.objects.get(pk=1).attachment.delete()
 
     @unittest.skip('Creates a file /media/email_attachments/2014/XX/XX/Test.docx')
     @override_settings(DEBUG=False)
@@ -352,7 +357,6 @@ class UtilTests(TestCase):
         email.save()
         self.recipient.email = 'john@email.com'
         utils.send_email(email, self.recipient)
-        models.Attachment.objects.get(pk=1).attachment.delete()
 
     # TODO Find way to put SendGrid Info without leaving it in the repo
     @unittest.skip('Test will send out emails')
