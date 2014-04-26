@@ -18,7 +18,7 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'daily_emailer', ['SentEmail'])
 
-        self.forward_migrate_status()
+        self.forward_migrate_status(orm)
 
         # Deleting field 'Campaign.status'
         db.delete_column(u'daily_emailer_campaign', 'status')
@@ -31,14 +31,14 @@ class Migration(SchemaMigration):
                       self.gf('daily_emailer.fields.StatusField')(null=True, blank=True),
                       keep_default=False)
 
-        self.backward_migrate_status()
+        self.backward_migrate_status(orm)
 
         # Deleting model 'SentEmail'
         db.delete_table(u'daily_emailer_sentemail')
 
 
-    def forward_migrate_status(self):
-        campaign_list = Campaign.objects.all()
+    def forward_migrate_status(self, orm):
+        campaign_list = orm.Campaign.objects.all()
         if campaign_list:
             for _campaign in campaign_list:
                 for key, value in _campaign.status:
@@ -46,11 +46,11 @@ class Migration(SchemaMigration):
                     SentEmail(email=_email, sent_date=value, campaign=_campaign)
 
 
-    def backward_migrate_status(self):
+    def backward_migrate_status(self, orm):
         campaign_list = Campaign.objects.all()
         if campaign_list:
             for _campaign in campaign_list:
-                sent_email_list = SentEmail.objects.all().filter(campaign=_campaign)
+                sent_email_list = orm.SentEmail.objects.all().filter(campaign=_campaign)
                 if sent_email_list:
                     for email in sent_email_list:
                         _campaign.status[int(email.email.pk)] = email.sent_date
