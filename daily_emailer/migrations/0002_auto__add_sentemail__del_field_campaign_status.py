@@ -14,37 +14,46 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('email', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['daily_emailer.Email'])),
             ('sent_date', self.gf('django.db.models.fields.DateField')(auto_now=True, blank=True)),
+            ('campaign', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['daily_emailer.Campaign'])),
         ))
         db.send_create_signal(u'daily_emailer', ['SentEmail'])
 
-        # Adding field 'Campaign.sent_date'
-        db.add_column(u'daily_emailer_campaign', 'sent_date',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=datetime.datetime(2014, 4, 25, 0, 0), to=orm['daily_emailer.SentEmail']),
-                      keep_default=False)
-
-        campaign_list = Campaign.objects.all()
-        if campaing_list:
-            for campaign in campaign_list:
-                for status_item in campaign.status:
-                    _email = Email.objects.get(pk= TODO get python to get key value only)
-                    SentEmail(email=_email, sent_date=status_item[_email])
-
+        self.forward_migrate_status()
 
         # Deleting field 'Campaign.status'
         db.delete_column(u'daily_emailer_campaign', 'status')
 
 
     def backwards(self, orm):
-        # Deleting model 'SentEmail'
-        db.delete_table(u'daily_emailer_sentemail')
 
         # Adding field 'Campaign.status'
         db.add_column(u'daily_emailer_campaign', 'status',
                       self.gf('daily_emailer.fields.StatusField')(null=True, blank=True),
                       keep_default=False)
 
-        # Deleting field 'Campaign.sent_date'
-        db.delete_column(u'daily_emailer_campaign', 'sent_date_id')
+        self.backward_migrate_status()
+
+        # Deleting model 'SentEmail'
+        db.delete_table(u'daily_emailer_sentemail')
+
+
+    def forward_migrate_status(self):
+        campaign_list = Campaign.objects.all()
+        if campaign_list:
+            for _campaign in campaign_list:
+                for key, value in _campaign.status:
+                    _email = Email.objects.get(pk=key)
+                    SentEmail(email=_email, sent_date=value, campaign=_campaign)
+
+
+    def backward_migrate_status(self):
+        campaign_list = Campaign.objects.all()
+        if campaign_list:
+            for _campaign in campaign_list:
+                sent_email_list = SentEmail.objects.all().filter(campaign=_campaign)
+                if sent_email_list:
+                    for email in sent_email_list:
+                        _campaign.status[int(email.email.pk)] = email.sent_date
 
 
     models = {
@@ -62,7 +71,6 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'recipient': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['daily_emailer.Recipient']"}),
             'reference_name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'sent_date': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['daily_emailer.SentEmail']"}),
             'start_date': ('django.db.models.fields.DateField', [], {})
         },
         u'daily_emailer.email': {
@@ -87,6 +95,7 @@ class Migration(SchemaMigration):
         },
         u'daily_emailer.sentemail': {
             'Meta': {'object_name': 'SentEmail'},
+            'campaign': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['daily_emailer.Campaign']"}),
             'email': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['daily_emailer.Email']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'sent_date': ('django.db.models.fields.DateField', [], {'auto_now': 'True', 'blank': 'True'})

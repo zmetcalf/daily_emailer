@@ -24,6 +24,7 @@ class Email(models.Model):
 class SentEmail(models.Model):
     email = models.ForeignKey('Email')
     sent_date = models.DateField(auto_now=True)
+    campaign = models.ForeignKey('Campaign')
 
 class EmailGroup(models.Model):
     group_name = models.CharField(max_length=50)
@@ -35,7 +36,6 @@ class EmailGroup(models.Model):
 class Campaign(models.Model):
     email_group = models.ForeignKey('EmailGroup')
     recipient = models.ForeignKey('Recipient')
-    sent_date = models.ForeignKey('SentEmail')
     reference_name = models.CharField(max_length=128)
     start_date = models.DateField()
     completed_date = models.DateField(null=True, blank=True)
