@@ -18,39 +18,31 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'daily_emailer', ['SentEmail'])
 
-        self.forward_migrate_status(orm)
-
-        # Deleting field 'Campaign.status'
-        db.delete_column(u'daily_emailer_campaign', 'status')
+        self.forward_migrate_status()
 
 
     def backwards(self, orm):
 
-        # Adding field 'Campaign.status'
-        db.add_column(u'daily_emailer_campaign', 'status',
-                      self.gf('daily_emailer.fields.StatusField')(null=True, blank=True),
-                      keep_default=False)
-
-        self.backward_migrate_status(orm)
+        self.backward_migrate_status()
 
         # Deleting model 'SentEmail'
         db.delete_table(u'daily_emailer_sentemail')
 
 
-    def forward_migrate_status(self, orm):
-        campaign_list = orm.Campaign.objects.all()
+    def forward_migrate_status(self):
+        campaign_list = Campaign.objects.all()
         if campaign_list:
             for _campaign in campaign_list:
-                for key, value in _campaign.status:
+                for key, value in _campaign.status.iteritems():
                     _email = Email.objects.get(pk=key)
                     SentEmail(email=_email, sent_date=value, campaign=_campaign)
 
 
-    def backward_migrate_status(self, orm):
+    def backward_migrate_status(self):
         campaign_list = Campaign.objects.all()
         if campaign_list:
             for _campaign in campaign_list:
-                sent_email_list = orm.SentEmail.objects.all().filter(campaign=_campaign)
+                sent_email_list = SentEmail.objects.all().filter(campaign=_campaign)
                 if sent_email_list:
                     for email in sent_email_list:
                         _campaign.status[int(email.email.pk)] = email.sent_date
@@ -71,7 +63,8 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'recipient': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['daily_emailer.Recipient']"}),
             'reference_name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'start_date': ('django.db.models.fields.DateField', [], {})
+            'start_date': ('django.db.models.fields.DateField', [], {}),
+            'status': ('daily_emailer.fields.StatusField', [], {'null': 'True', 'blank': 'True'})
         },
         u'daily_emailer.email': {
             'Meta': {'object_name': 'Email'},

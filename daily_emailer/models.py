@@ -36,6 +36,7 @@ class EmailGroup(models.Model):
 class Campaign(models.Model):
     email_group = models.ForeignKey('EmailGroup')
     recipient = models.ForeignKey('Recipient')
+    status = fields.StatusField(null=True, blank=True) # Depreciated
     reference_name = models.CharField(max_length=128)
     start_date = models.DateField()
     completed_date = models.DateField(null=True, blank=True)
