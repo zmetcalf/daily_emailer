@@ -101,24 +101,6 @@ class AjaxCampaignEmailsTests(TestCase):
         response = self.client.post('/daily_emailer/campaign_emails/1/')
         self.assertEqual(response.status_code, 404)
 
-class StatusFieldTests(TestCase):
-
-    def setUp(self):
-        recipient = models.Recipient(first_name='John', last_name='Smith',
-                                     email='sample@email.com')
-        recipient.save()
-        eq = models.EmailGroup(group_name='NewRep')
-        eq.save()
-        campaign = models.Campaign(reference_name='RefName',
-                                   status='{1: "2014-4-1", 2: "2014-4-2"}',
-                                   start_date=timezone.now(), email_group = eq,
-                                   recipient = recipient)
-        campaign.save()
-
-    def test_status_field_to_python(self):
-        email_history = models.Campaign.objects.all().filter(reference_name='RefName')
-        self.assertEqual(email_history[0].status, {1: '2014-4-1', 2: '2014-4-2'})
-
 class SendDailyEmailTests(TestCase):
 
     def setUp(self):
@@ -129,21 +111,23 @@ class SendDailyEmailTests(TestCase):
         eq.save()
         eq.email_set.create(subject='Subject1', message='Message1')
         eq.email_set.create(subject='Subject2', message='Message2')
-        eq.email_set.create(subject='Subject3', message='Message3')
+        sent_email_three = eq.email_set.create(subject='Subject3', message='Message3')
         eq.save()
         campaign = models.Campaign(reference_name='RefName',
-                                   status="{3: '%s'}" % str(datetime.date.today()),
                                    start_date=str(datetime.date.today()),
                                    email_group=eq,
                                    recipient=recipient)
         campaign.save()
+        campaign.sentemail_set.create(email=sent_email_three,
+            sent_date=datetime.date.today())
+        campaign.save()
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         success = models.Campaign(reference_name='Success',
-                                   status="{3: '%s'}" % str(yesterday),
                                    start_date=str(datetime.date.today()),
                                    email_group=eq,
                                    recipient=recipient)
         success.save()
+        success.sentemail_set.create(email=sent_email_three, sent_date=yesterday)
         self.cmd = send_daily_email.Command()
 
     def test_get_next_email_success(self):
