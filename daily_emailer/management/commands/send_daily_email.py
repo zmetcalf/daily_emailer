@@ -35,7 +35,7 @@ class Command(BaseCommand):
                 campaign.email_group.email_order = str(email_order).strip('[]').replace(' ', '')
                 campaign.email_group.save()
 
-            next_email = self.get_next_email(emails, email_order, campaign.status)
+            next_email = self.get_next_email(emails, email_order, campaign)
 
             if next_email:
                 utils.send_email(next_email, campaign.recipient)
@@ -44,27 +44,30 @@ class Command(BaseCommand):
                             campaign.recipient.first_name,
                             campaign.recipient.last_name,
                             campaign.recipient.email)))
-                campaign.status[int(next_email.pk)] = str(datetime.date.today())
+                campaign.sentemail_set.create(email=next_email,
+                                              sent_date=datetime.date.today())
             else:
                 campaign.completed_date = datetime.date.today()
             campaign.save()
 
     # Check to see if completd or already sent that day
-    def get_ok_to_mail(self, campaign):
-        if campaign.completed_date:
+    def get_ok_to_mail(self, _campaign):
+        if _campaign.completed_date:
             return False
 
-        if not campaign.status:
-            if (campaign.start_date - datetime.date.today()).days <= 0:
+        sent_emails = models.SentEmail.objects.all().filter(campaign=_campaign)
+
+        if not sent_emails:
+            if (_campaign.start_date - datetime.date.today()).days <= 0:
                 return True
             else:
                 return False
 
         last_date = datetime.date(1970, 1, 1)
-        for key, value in campaign.status.iteritems():
-            _value = datetime.datetime.strptime(value, "%Y-%m-%d").date()
-            if (last_date - _value).days < 0:
-                last_date = _value
+
+        for sent in sent_emails:
+            if (last_date - sent.sent_date).days < 0:
+                last_date = sent.sent_date
 
         if (last_date  - datetime.date.today()).days >= 0:
             return False
@@ -84,9 +87,12 @@ class Command(BaseCommand):
         return email_order
 
     # Algorithm to deterine next email to be sent
-    def get_next_email(self, emails, email_order, sent_dict):
+    def get_next_email(self, emails, email_order, _campaign):
+        sent_email_pk_list = []
+        for sent_email in models.SentEmail.objects.all().filter(campaign=_campaign):
+            sent_email_pk_list.append(sent_email.email.pk)
         for ordered_email in email_order:
-            if not ordered_email in sent_dict.keys():
+            if not ordered_email in sent_email_pk_list:
                 for email in emails:
                     if email.pk == ordered_email:
                         return email

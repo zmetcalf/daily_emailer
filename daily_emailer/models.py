@@ -21,7 +21,7 @@ class Email(models.Model):
 
 class SentEmail(models.Model):
     email = models.ForeignKey('Email')
-    sent_date = models.DateField(auto_now=True)
+    sent_date = models.DateField()
     campaign = models.ForeignKey('Campaign')
 
 class EmailGroup(models.Model):
