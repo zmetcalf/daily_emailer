@@ -294,6 +294,7 @@ class SendDailyEmailTests(TestCase):
     def test_handle_completed(self):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         models.SentEmail.objects.all().delete()
+        self.campaign.delete()
         self.assertEqual(len(models.SentEmail.objects.all().filter(
             campaign=self.success)), 0)
 
@@ -307,13 +308,13 @@ class SendDailyEmailTests(TestCase):
 
         self.assertEqual(len(models.SentEmail.objects.all().filter(
             campaign=self.success)), 3)
-
         self.cmd.execute()
 
+        campaign = models.Campaign.objects.get(reference_name="Success")
         self.assertEqual(len(models.SentEmail.objects.all().filter(
-            campaign=self.success)), 3)
+            campaign=campaign)), 3)
         self.assertEqual(len(mail.outbox), 0)
-        self.assertEqual(self.success.completed_date, datetime.date.today())
+        self.assertEqual(campaign.completed_date, datetime.date.today())
 
 class UtilTests(TestCase):
 
