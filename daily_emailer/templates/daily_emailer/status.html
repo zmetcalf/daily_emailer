@@ -1,0 +1,14 @@
+<div>
+<ul>
+{% for email in email_list %}
+  {% if email.sent_date %}
+    <li><h3 class='sent-email'>{{ email.subject }} - {{ email.sent_date }}</h3></li>
+  {% endif %}
+{% endfor %}
+{% for email in email_list %}
+  {% if not email.sent_date %}
+    <li><h3 class='unsent-email'>{{ email.subject }} - Not Sent</h3></li>
+  {% endif %}
+{% endfor %}
+</ul>
+</div>

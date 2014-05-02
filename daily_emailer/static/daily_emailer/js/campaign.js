@@ -39,42 +39,14 @@ function set_reference_name() {
 }
 
 function show_status() {
-  $.ajax(('/daily_emailer/campaign_emails/' +
+  $.ajax(('/daily_emailer/sent_emails/' +
     $('.field-id > div > p').text() + '/'), {
       type: 'POST',
       success: [
         function(email_list) {
-          _.each(email_list, function(email) {
-            email_collection.add(email);
-          });
-        },
-        render_status
+          $('#id_status').html(email_list);
+        }
       ]
     }
   );
-}
-
-function render_status() {
-  var view = { 'email': [] };
-  var sent_emails = eval("(" + $('.field-status > div > p').text() + ")");
-  email_collection.each(function(email) {
-    var sent = false;
-
-    var key = _.find(_.keys(sent_emails), function(key) {
-      return key == email.get('pk');
-    });
-
-    if(key) {
-      sent = sent_emails[key];
-    }
-
-    view.email.push({ 'name': email.get('fields').subject, 'date_sent': sent });
-  });
-
-  $.ajax('/daily_emailer/mustache_template/status.html', {
-    type: 'GET',
-    success: function(mustache_template) {
-      $('#id_status').html(Mustache.render(mustache_template, view));
-    }
-  });
 }
