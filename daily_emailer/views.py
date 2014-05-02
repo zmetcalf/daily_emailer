@@ -22,17 +22,17 @@ def ajax_sent_emails(request, campaign):
         email_group_id=_campaign.email_group.pk)
 
     sent_emails = SentEmail.objects.all().filter(campaign=_campaign)
-
-    sent_emails_pks = []
-    for se in sent_emails:
-        sent_emails_pks.append(se.email.pk)
+    sent_emails_pk = SentEmail.objects.all().filter(campaign=_campaign).values_list(
+        'email__id', flat=True)
 
     email_list = []
 
     for email in emails:
-        if email.pk in sent_emails_pks:
-                email_list.append({ 'subject': email.subject,
-                                    'sent_date': se.sent_date })
+        if email.pk in sent_emails_pk:
+            for se in sent_emails:
+                if se.email == email:
+                    email_list.append({ 'subject': email.subject,
+                                        'sent_date': se.sent_date })
         else:
             email_list.append({ 'subject': email.subject })
 

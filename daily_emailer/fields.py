@@ -1,3 +1,5 @@
+import warnings
+
 from ast import literal_eval
 from collections import MutableMapping
 
@@ -12,6 +14,7 @@ class StatusField(models.TextField):
     description = 'Tracks which emails have been sent.'
 
     def __init__(self, *args, **kwargs):
+        warnings.warn('deprecated - used for migration 0001', DeprecationWarning)
         super(StatusField, self).__init__(*args, **kwargs)
 
     __metaclass__ = models.SubfieldBase
