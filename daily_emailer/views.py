@@ -21,20 +21,23 @@ def ajax_sent_emails(request, campaign):
     emails = get_list_or_404(Email,
         email_group_id=_campaign.email_group.pk)
 
-    sent_emails = get_list_or_404(SentEmail, campaign=_campaign)
+    sent_emails = SentEmail.objects.all().filter(campaign=_campaign)
 
-    email_list = {}
+    sent_emails_pks = []
+    for se in sent_emails:
+        sent_emails_pks.append(se.email.pk)
+
+    email_list = []
 
     for email in emails:
-        for se in sent_emails:
-            if se.email == email:
-                email_list[email] = { email.subject: se.sent_date }
-                continue
-        email_list[email] = { email.subject: '' }
+        if email.pk in sent_emails_pks:
+                email_list.append({ 'subject': email.subject,
+                                    'sent_date': se.sent_date })
+        else:
+            email_list.append({ 'subject': email.subject })
 
-    print email_list
-
-    return render(request, 'daily_emailer/status.html', email_list)
+    return render(request, 'daily_emailer/status.html',
+                  { 'email_list': email_list })
 
 def js_tests(request):
     return render(request, 'daily_emailer/js_tests.html')
