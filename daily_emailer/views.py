@@ -1,3 +1,5 @@
+import os
+
 from django.core import serializers
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, get_list_or_404, render
@@ -41,7 +43,8 @@ def ajax_sent_emails(request, campaign):
 
 def ajax_get_mustache_template(request, template):
     try:
-        template = open('daily_emailer/templates/daily_emailer/mustache/{0}'.format(template), 'rb')
+        template = open('{0}/daily_emailer/templates/daily_emailer/mustache/{1}'.format(
+            os.path.dirname(os.path.dirname(__file__)), template), 'rb')
     except IOError:
         raise Http404
     return HttpResponse(template, content_type='text/plain')
