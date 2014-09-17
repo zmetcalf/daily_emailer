@@ -5,15 +5,13 @@ import unittest
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.management.base import  CommandError
-from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
-from django.utils import timezone
 
-from daily_emailer import models, fields, utils
+from daily_emailer import models, utils
 from daily_emailer.management.commands import send_daily_email
+
 
 class AjaxAssociatedEmailTests(TestCase):
 
@@ -54,6 +52,7 @@ class AjaxAssociatedEmailTests(TestCase):
         response = self.client.post('/daily_emailer/associated_emails/1/')
         self.assertEqual(response.status_code, 404)
 
+
 class AjaxCampaignEmailsTests(TestCase):
 
     def setUp(self):
@@ -78,28 +77,25 @@ class AjaxCampaignEmailsTests(TestCase):
 
     def test_ajax_campaign_emails(self):
         self.client.login(username='Admin', password='password')
-        response = self.client.post('/daily_emailer/campaign_emails/1/')
-        data = json.loads(response.content)
-        self.assertEqual(data[0]['pk'], 1)
-        self.assertEqual(data[0]['fields']['message'], 'Message1')
-        self.assertEqual(data[1]['fields']['message'], 'Message2')
-        self.assertEqual(data[2]['fields']['message'], 'Message3')
+        response = self.client.post('/daily_emailer/sent_emails/1/')
+        self.assertContains(response, 'Subject1 - Not Sent')
+        self.assertContains(response, 'Subject2 - Not Sent')
+        self.assertContains(response, 'Subject3 - Not Sent')
 
     def test_ajax_campaign_emails_authenticated_empty(self):
         self.client.login(username='Admin', password='password')
-        response = self.client.post('/daily_emailer/campaign_emails/2/')
-        data = json.loads(response.content)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, [])
+        response = self.client.post('/daily_emailer/sent_emails/2/')
+        self.assertEqual(response.status_code, 404)
 
     def test_ajax_campaign_emails_authenticated(self):
         self.client.login(username='Admin', password='password')
-        response = self.client.post('/daily_emailer/campaign_emails/1/')
+        response = self.client.post('/daily_emailer/sent_emails/1/')
         self.assertEqual(response.status_code, 200)
 
     def test_ajax_campaign_emails_unauthenticated(self):
-        response = self.client.post('/daily_emailer/campaign_emails/1/')
+        response = self.client.post('/daily_emailer/sent_emails/1/')
         self.assertEqual(response.status_code, 404)
+
 
 class SendDailyEmailTests(TestCase):
 
@@ -197,7 +193,7 @@ class SendDailyEmailTests(TestCase):
     def test_get_ok_to_mail_none_today(self):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         models.SentEmail.objects.all().delete()
-        se =  self.campaign.sentemail_set.create(email=self.email3,
+        self.campaign.sentemail_set.create(email=self.email3,
             sent_date=yesterday)
         self.campaign.save()
         self.assertTrue(self.cmd.get_ok_to_mail(self.campaign))
@@ -316,6 +312,7 @@ class SendDailyEmailTests(TestCase):
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(campaign.completed_date, datetime.date.today())
 
+
 class UtilTests(TestCase):
 
     def setUp(self):
@@ -344,7 +341,7 @@ class UtilTests(TestCase):
         eg.save()
         email = models.Email.objects.get(subject='Subject1')
         email.save()
-        attachment = email.attachment_set.create(file_name='TestFile',
+        email.attachment_set.create(file_name='TestFile',
             attachment=SimpleUploadedFile('Test.docx', 'File Contents'))
         email.save()
         utils.send_email(email, self.recipient)

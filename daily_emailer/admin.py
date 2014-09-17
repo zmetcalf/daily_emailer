@@ -2,12 +2,14 @@ from django.contrib import admin
 
 from daily_emailer import models
 
+
 class AttachmentInline(admin.TabularInline):
     model = models.Attachment
     extra = 1
 
+
 class EmailAdmin(admin.ModelAdmin):
-    inlines = [AttachmentInline,]
+    inlines = [AttachmentInline, ]
     list_display = ('__str__', 'email_group')
 
     class Media:
@@ -16,6 +18,7 @@ class EmailAdmin(admin.ModelAdmin):
             'daily_emailer/js/email.js',
             '//tinymce.cachefly.net/4.0/tinymce.min.js',
         )
+
 
 class EmailGroupAdmin(admin.ModelAdmin):
     readonly_fields = ()
@@ -49,6 +52,7 @@ class EmailGroupAdmin(admin.ModelAdmin):
             return self.readonly_fields + ('id',)
         return self.readonly_fields
 
+
 class CampaignAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'recipient', 'start_date', 'completed_date')
     exclude = ()
@@ -66,16 +70,11 @@ class CampaignAdmin(admin.ModelAdmin):
             'daily_emailer/js/campaign.js',
         )
 
-    def get_form(self, request, obj=None, **kwargs):
-        self.exclude = ()
-        if not obj:
-            self.exclude = ('status',)
-        return super(CampaignAdmin, self).get_form(request, obj, **kwargs)
-
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return self.readonly_fields + ('email_group', 'id', 'status', 'recipient',)
+            return self.readonly_fields + ('email_group', 'id', 'recipient',)
         return self.readonly_fields
+
 
 class RecipientAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'email')

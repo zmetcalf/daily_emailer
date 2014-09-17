@@ -1,6 +1,5 @@
 from django.db import models
 
-from daily_emailer import fields
 
 class Recipient(models.Model):
     first_name = models.CharField(max_length=50)
@@ -9,6 +8,7 @@ class Recipient(models.Model):
 
     def __unicode__(self):
         return "{0}, {1}".format(self.last_name, self.first_name)
+
 
 class Email(models.Model):
     subject = models.CharField(max_length=77)
@@ -19,10 +19,12 @@ class Email(models.Model):
         return (self.subject[:50] + '...') if len(self.subject) > 50 \
                                            else self.subject
 
+
 class SentEmail(models.Model):
     email = models.ForeignKey('Email')
     sent_date = models.DateField()
     campaign = models.ForeignKey('Campaign')
+
 
 class EmailGroup(models.Model):
     group_name = models.CharField(max_length=50)
@@ -31,16 +33,17 @@ class EmailGroup(models.Model):
     def __unicode__(self):
         return self.group_name
 
+
 class Campaign(models.Model):
     email_group = models.ForeignKey('EmailGroup')
     recipient = models.ForeignKey('Recipient')
-    status = fields.StatusField(null=True, blank=True) # Depreciated
     reference_name = models.CharField(max_length=128)
     start_date = models.DateField()
     completed_date = models.DateField(null=True, blank=True)
 
     def __unicode__(self):
         return self.reference_name
+
 
 class Attachment(models.Model):
     file_name = models.CharField(max_length=50)
