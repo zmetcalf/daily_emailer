@@ -26,7 +26,7 @@ upload any file and send it out to any email address.
 
 ## Installation
 
-Daily emailer was developed with django 1.6.2, and it has only been tested with this version.
+Daily emailer was originally developed with django 1.6 and has been updated to django 1.7. It has only been tested with these versions.
 
 Also, it has only been tested with MySQL and sqlite3.
 
