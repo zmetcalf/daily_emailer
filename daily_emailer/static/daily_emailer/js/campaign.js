@@ -9,7 +9,9 @@ $(document).ready(function() {
 
 
   // Add and remove fields
-  $('.field-recipient').after('<div class="form-row"><label>Status:</label><div id="id_status"></div></div>');
+  if ($('.field-id').length) {
+    $('.field-recipient').after('<div class="form-row"><label>Status:</label><div id="id_status"></div></div>');
+  }
   $('.field-id').hide();
   if($('.field-id > div > p').text()) {
     show_status();
