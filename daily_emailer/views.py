@@ -2,9 +2,10 @@ import os
 
 from django.core import serializers
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, get_list_or_404, render
+from django.shortcuts import render
 
-from daily_emailer.models import Campaign, Email, SentEmail
+from daily_emailer.models import Email
+
 
 def ajax_associated_emails(request, group_id):
     if not request.user.is_staff:
@@ -16,30 +17,6 @@ def ajax_associated_emails(request, group_id):
     data = serializers.serialize('json', emails)
     return HttpResponse(data, content_type='application/json')
 
-def ajax_sent_emails(request, campaign):
-    if not request.user.is_staff:
-        raise Http404
-    _campaign = get_object_or_404(Campaign, pk=campaign)
-    emails = get_list_or_404(Email,
-        email_group_id=_campaign.email_group.pk)
-
-    sent_emails = SentEmail.objects.all().filter(campaign=_campaign)
-    sent_emails_pk = SentEmail.objects.all().filter(campaign=_campaign).values_list(
-        'email__id', flat=True)
-
-    email_list = []
-
-    for email in emails:
-        if email.pk in sent_emails_pk:
-            for se in sent_emails:
-                if se.email == email:
-                    email_list.append({ 'subject': email.subject,
-                                        'sent_date': se.sent_date })
-        else:
-            email_list.append({ 'subject': email.subject })
-
-    return render(request, 'daily_emailer/status.html',
-                  { 'email_list': email_list })
 
 def ajax_get_mustache_template(request, template):
     try:
@@ -48,6 +25,7 @@ def ajax_get_mustache_template(request, template):
     except IOError:
         raise Http404
     return HttpResponse(template, content_type='text/plain')
+
 
 def js_tests(request):
     return render(request, 'daily_emailer/js_tests.html')

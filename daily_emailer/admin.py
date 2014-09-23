@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.template.loader import render_to_string
 
 from daily_emailer import models
 
@@ -62,18 +63,34 @@ class CampaignAdmin(admin.ModelAdmin):
         css = {
             'all': ('daily_emailer/css/campaign.css',)
         }
-        js = (
-            '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
-            '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js',
-            '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js',
-            '//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js',
-            'daily_emailer/js/campaign.js',
-        )
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return self.readonly_fields + ('email_group', 'id', 'recipient',)
+            return self.readonly_fields + ('email_group', 'status', 'recipient',)
         return self.readonly_fields
+
+    def status(self, instance):
+        emails = models.Email.objects.all().filter(email_group_id=instance.email_group.pk)
+
+        sent_emails = models.SentEmail.objects.all().filter(campaign=instance)
+        sent_emails_pk = models.SentEmail.objects.all().filter(campaign=instance).values_list(
+            'email__id', flat=True)
+
+        email_list = []
+
+        for email in emails:
+            if email.pk in sent_emails_pk:
+                for se in sent_emails:
+                    if se.email == email:
+                        email_list.append({'subject': email.subject,
+                                           'sent_date': se.sent_date})
+            else:
+                email_list.append({'subject': email.subject})
+
+        return render_to_string('daily_emailer/status.html',
+                                {'email_list': email_list})
+
+    status.allow_tags = True
 
 
 class RecipientAdmin(admin.ModelAdmin):
