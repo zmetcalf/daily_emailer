@@ -75,27 +75,6 @@ class AjaxCampaignEmailsTests(TestCase):
         campaign.save()
         self.client = Client()
 
-    def test_ajax_campaign_emails(self):
-        self.client.login(username='Admin', password='password')
-        response = self.client.post('/daily_emailer/sent_emails/1/')
-        self.assertContains(response, 'Subject1 - Not Sent')
-        self.assertContains(response, 'Subject2 - Not Sent')
-        self.assertContains(response, 'Subject3 - Not Sent')
-
-    def test_ajax_campaign_emails_authenticated_empty(self):
-        self.client.login(username='Admin', password='password')
-        response = self.client.post('/daily_emailer/sent_emails/2/')
-        self.assertEqual(response.status_code, 404)
-
-    def test_ajax_campaign_emails_authenticated(self):
-        self.client.login(username='Admin', password='password')
-        response = self.client.post('/daily_emailer/sent_emails/1/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_ajax_campaign_emails_unauthenticated(self):
-        response = self.client.post('/daily_emailer/sent_emails/1/')
-        self.assertEqual(response.status_code, 404)
-
 
 class SendDailyEmailTests(TestCase):
 
