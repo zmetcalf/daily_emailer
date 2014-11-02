@@ -13,17 +13,17 @@ class Recipient(models.Model):
 class Email(models.Model):
     subject = models.CharField(max_length=77)
     message = models.TextField()
-    email_group = models.ForeignKey('EmailGroup')
+    email_group = models.ForeignKey('EmailGroup', related_name='email')
 
     def __unicode__(self):
         return (self.subject[:50] + '...') if len(self.subject) > 50 \
-                                           else self.subject
+            else self.subject
 
 
 class SentEmail(models.Model):
     email = models.ForeignKey('Email')
     sent_date = models.DateField()
-    campaign = models.ForeignKey('Campaign')
+    campaign = models.ForeignKey('Campaign', related_name='sent_email')
 
 
 class EmailGroup(models.Model):

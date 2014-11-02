@@ -21,9 +21,9 @@ class AjaxAssociatedEmailTests(TestCase):
         user.save()
         eg = models.EmailGroup(group_name='NewRep')
         eg.save()
-        eg.email_set.create(subject='Subject1', message='Message1')
-        eg.email_set.create(subject='Subject2', message='Message2')
-        eg.email_set.create(subject='Subject3', message='Message3')
+        eg.email.create(subject='Subject1', message='Message1')
+        eg.email.create(subject='Subject2', message='Message2')
+        eg.email.create(subject='Subject3', message='Message3')
         eg.save()
         self.client = Client()
 
@@ -64,9 +64,9 @@ class AjaxCampaignEmailsTests(TestCase):
         recipient.save()
         eg = models.EmailGroup(group_name='NewRep')
         eg.save()
-        eg.email_set.create(subject='Subject1', message='Message1')
-        eg.email_set.create(subject='Subject2', message='Message2')
-        eg.email_set.create(subject='Subject3', message='Message3')
+        eg.email.create(subject='Subject1', message='Message1')
+        eg.email.create(subject='Subject2', message='Message2')
+        eg.email.create(subject='Subject3', message='Message3')
         eg.save()
         campaign = models.Campaign(reference_name='C1',
             start_date=datetime.date.today())
@@ -84,16 +84,16 @@ class SendDailyEmailTests(TestCase):
         recipient.save()
         eg = models.EmailGroup(group_name='NewRep', email_order='3,1,2')
         eg.save()
-        self.email1 = eg.email_set.create(subject='Subject1', message='Message1')
-        self.email2 = eg.email_set.create(subject='Subject2', message='Message2')
-        self.email3 = eg.email_set.create(subject='Subject3', message='Message3')
+        self.email1 = eg.email.create(subject='Subject1', message='Message1')
+        self.email2 = eg.email.create(subject='Subject2', message='Message2')
+        self.email3 = eg.email.create(subject='Subject3', message='Message3')
         eg.save()
         self.campaign = models.Campaign(reference_name='RefName',
                                    start_date=str(datetime.date.today()),
                                    email_group=eg,
                                    recipient=recipient)
         self.campaign.save()
-        self.campaign.sentemail_set.create(email=self.email3,
+        self.campaign.sent_email.create(email=self.email3,
             sent_date=datetime.date.today())
         self.campaign.save()
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
@@ -102,13 +102,13 @@ class SendDailyEmailTests(TestCase):
                                    email_group=eg,
                                    recipient=recipient)
         self.success.save()
-        self.success.sentemail_set.create(email=self.email3, sent_date=yesterday)
+        self.success.sent_email.create(email=self.email3, sent_date=yesterday)
         self.cmd = send_daily_email.Command()
 
     def test_get_next_email_success(self):
         email_order = models.EmailGroup.objects.get(group_name='NewRep')
         emails = models.Email.objects.all().filter(email_group=email_order)
-        self.campaign.sentemail_set.create(email=self.email3,
+        self.campaign.sent_email.create(email=self.email3,
             sent_date=datetime.date.today())
         self.campaign.save()
         self.assertEqual(self.cmd.get_next_email(emails, [3,1,2],
@@ -117,11 +117,11 @@ class SendDailyEmailTests(TestCase):
     def test_get_next_email_fail(self):
         email_order = models.EmailGroup.objects.get(group_name='NewRep')
         emails = models.Email.objects.all().filter(email_group=email_order)
-        self.campaign.sentemail_set.create(email=self.email1,
+        self.campaign.sent_email.create(email=self.email1,
             sent_date=datetime.date.today())
-        self.campaign.sentemail_set.create(email=self.email2,
+        self.campaign.sent_email.create(email=self.email2,
             sent_date=datetime.date.today())
-        self.campaign.sentemail_set.create(email=self.email3,
+        self.campaign.sent_email.create(email=self.email3,
             sent_date=datetime.date.today())
         self.campaign.save()
         self.assertEqual(self.cmd.get_next_email(emails, [3,1,2],
@@ -172,7 +172,7 @@ class SendDailyEmailTests(TestCase):
     def test_get_ok_to_mail_none_today(self):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         models.SentEmail.objects.all().delete()
-        self.campaign.sentemail_set.create(email=self.email3,
+        self.campaign.sent_email.create(email=self.email3,
             sent_date=yesterday)
         self.campaign.save()
         self.assertTrue(self.cmd.get_ok_to_mail(self.campaign))
@@ -180,7 +180,7 @@ class SendDailyEmailTests(TestCase):
     def test_get_ok_to_mail_none_today_or_day_before(self):
         models.SentEmail.objects.all().delete()
         two_yesterday = datetime.date.today() - datetime.timedelta(days=2)
-        self.campaign.sentemail_set.create(email=self.email3, sent_date=two_yesterday)
+        self.campaign.sent_email.create(email=self.email3, sent_date=two_yesterday)
         self.campaign.save()
         self.assertTrue(self.cmd.get_ok_to_mail(self.campaign))
 
@@ -210,9 +210,9 @@ class SendDailyEmailTests(TestCase):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         models.SentEmail.objects.all().delete()
 
-        self.success.sentemail_set.create(email=self.email3,
+        self.success.sent_email.create(email=self.email3,
             sent_date=yesterday)
-        self.success.sentemail_set.create(email=self.email1,
+        self.success.sent_email.create(email=self.email1,
             sent_date=yesterday)
         self.success.save()
 
@@ -230,9 +230,9 @@ class SendDailyEmailTests(TestCase):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         models.SentEmail.objects.all().delete()
 
-        self.success.sentemail_set.create(email=self.email3,
+        self.success.sent_email.create(email=self.email3,
             sent_date=yesterday)
-        self.success.sentemail_set.create(email=self.email1,
+        self.success.sent_email.create(email=self.email1,
             sent_date=yesterday)
         self.success.save()
 
@@ -250,9 +250,9 @@ class SendDailyEmailTests(TestCase):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         models.SentEmail.objects.all().delete()
 
-        self.success.sentemail_set.create(email=self.email3,
+        self.success.sent_email.create(email=self.email3,
             sent_date=yesterday)
-        self.success.sentemail_set.create(email=self.email1,
+        self.success.sent_email.create(email=self.email1,
             sent_date=yesterday)
         self.success.save()
 
@@ -273,11 +273,11 @@ class SendDailyEmailTests(TestCase):
         self.assertEqual(len(models.SentEmail.objects.all().filter(
             campaign=self.success)), 0)
 
-        self.success.sentemail_set.create(email=self.email3,
+        self.success.sent_email.create(email=self.email3,
             sent_date=yesterday)
-        self.success.sentemail_set.create(email=self.email1,
+        self.success.sent_email.create(email=self.email1,
             sent_date=yesterday)
-        self.success.sentemail_set.create(email=self.email2,
+        self.success.sent_email.create(email=self.email2,
             sent_date=yesterday)
         self.success.save()
 
@@ -316,7 +316,7 @@ class UtilTests(TestCase):
     def test_attachment_send_django_email(self):
         eg = models.EmailGroup(group_name='NewRep', email_order='3,1,2')
         eg.save()
-        eg.email_set.create(subject='Subject1', message='Message1')
+        eg.email.create(subject='Subject1', message='Message1')
         eg.save()
         email = models.Email.objects.get(subject='Subject1')
         email.save()
@@ -335,7 +335,7 @@ class UtilTests(TestCase):
     def test_sendgrid_attachment_email(self):
         eg = models.EmailGroup(group_name='NewRep', email_order='3,1,2')
         eg.save()
-        eg.email_set.create(subject='Subject1', message='Message1')
+        eg.email.create(subject='Subject1', message='Message1')
         eg.save()
         email = models.Email.objects.get(subject='Subject1')
         email.save()
