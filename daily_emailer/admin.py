@@ -63,6 +63,11 @@ class CampaignAdmin(admin.ModelAdmin):
         css = {
             'all': ('daily_emailer/css/campaign.css',)
         }
+        js = (
+            '//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js',
+            'daily_emailer/js/campaign.js'
+        )
+
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
