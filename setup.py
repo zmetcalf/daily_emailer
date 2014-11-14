@@ -10,8 +10,7 @@ setup(name='daily_emailer',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-        'django>=1.6.2',
-        'sendgrid>=0.3.5',
-        'south',
-        ],
-     )
+          'django>=1.6.2',
+          'sendgrid>=0.3.5',
+      ],
+      )
