@@ -13,8 +13,7 @@ class Command(BaseCommand):
         sent_emails = []
 
         campaign_list = models.Campaign.objects.all().select_related(
-            'email_group', 'recipient', 'sent_email',
-            'sent_email__email').prefetch_related(
+            'email_group', 'recipient',).prefetch_related(
             'email_group__email')
 
         if not campaign_list:
@@ -30,7 +29,8 @@ class Command(BaseCommand):
                 continue
 
             if campaign.email_group.email_order:
-                email_order = list(map(int,
+                email_order = list(map(
+                    int,
                     campaign.email_group.email_order.strip('[]').split(',')))
             else:
                 email_order = []
